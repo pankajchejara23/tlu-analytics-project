@@ -1,5 +1,6 @@
 project:
   type: website
+  output-dir: docs
 
 website:
   title: "TULA"
@@ -21,7 +22,7 @@ website:
   page-footer: 
     center: "Pankaj Chejara"
 
-
+bibliography: ref.bib
 format:
   html:
     theme: material
