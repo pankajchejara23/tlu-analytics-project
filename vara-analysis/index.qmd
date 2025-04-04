@@ -1,0 +1,26 @@
+---
+title: "Learning Analytics Research Group"
+subtitle: "At the Intersection of Education, Data, and Innovation"
+format:
+  html:
+    code-tools: false
+
+---
+
+
+::: {.grid}
+::: {.g-col-12 .g-col-md-8}
+### Welcome to Our Research Group {.mt-4}
+
+We investigate how **data and technology** can transform education at Tallinn University, bridging:
+- Learning sciences with computational analytics  
+- Pedagogical theories with AI-driven tools  
+- Classroom practices with scalable innovations  
+
+Our work focuses on ethical, evidence-based solutions for modern education challenges.
+:::
+
+::: {.g-col-12 .g-col-md-4 .d-flex .align-items-center}
+![Connecting the dots](https://cdn-icons-png.flaticon.com/512/2103/2103633.png){.img-fluid .float-end style="max-width: 250px;"}
+:::
+:::

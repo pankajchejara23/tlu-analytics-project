@@ -1,0 +1,39 @@
+project:
+  type: website
+
+website:
+  title: "TULA"
+  navbar:
+    left:
+      - href: index.qmd
+        text: Home
+      - href: ./posts/data.ipynb
+        text: Dataset
+      - href: ./posts/pre.ipynb
+        text: Preprocessing
+      - href: ./posts/analysis.ipynb
+        text: Analysis
+      - href: ./posts/results.ipynb
+        text: Results
+      
+      - about.qmd
+
+  page-footer: 
+    center: "Pankaj Chejara"
+
+
+format:
+  html:
+    theme: material
+    css: styles.css
+    toc: true
+    toc-location: left
+    code-tools: true
+    code-copy: true
+    include-after-body:
+      - text: |
+          <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+          <script>mermaid.initialize({startOnLoad: true});</script>
+
+
+

@@ -1,0 +1,12 @@
+/* css styles */
+/* Light mode */
+html {
+    --md-primary-fg-color: #3f51b5;
+    --md-accent-fg-color: #ff5252;
+  }
+  
+  /* Dark mode */
+  [data-md-color-scheme="slate"] {
+    --md-primary-fg-color: #5e35b1;
+    --md-hue: 250; 
+  }
