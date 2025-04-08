@@ -2,12 +2,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.57">
+<meta name="generator" content="quarto-1.6.42">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Learning Analytics Research Group – TULA</title>
+<title>Impact analysis of Flexible Learning Trajectories – TULA</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -35,10 +35,10 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-2f5df379a58b258e96c21c0638c20c03.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-88fff7c424fdc5c1f44e2e01e687ecf9.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -71,7 +71,7 @@ ul.task-list li input[type="checkbox"] {
 <link rel="stylesheet" href="styles.css">
 </head>
 
-<body class="floating nav-fixed">
+<body class="floating nav-fixed fullcontent">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -105,12 +105,8 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text">Analysis</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./posts/results.html"> 
-<span class="menu-text">Results</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="./about.html"> 
-<span class="menu-text">About</span></a>
+    <a class="nav-link" href="./posts/predict.html"> 
+<span class="menu-text">Prediction</span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -127,15 +123,14 @@ ul.task-list li input[type="checkbox"] {
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-    </div>
+    
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Learning Analytics Research Group</h1>
-<p class="subtitle lead">At the Intersection of Education, Data, and Innovation</p>
+<h1 class="title">Impact analysis of Flexible Learning Trajectories</h1>
+<p class="subtitle lead">Investigating Relationships Between Engagement Patterns and Learning Outcomes</p>
 </div>
 
 
@@ -152,25 +147,35 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<div class="grid">
-<section id="welcome-to-our-research-group" class="level3 mt-4 g-col-12 g-col-md-8">
-<h3 class="mt-4 anchored" data-anchor-id="welcome-to-our-research-group">Welcome to Our Research Group</h3>
-<p>We investigate how <strong>data and technology</strong> can transform education at Tallinn University, bridging: - Learning sciences with computational analytics<br>
-- Pedagogical theories with AI-driven tools<br>
-- Classroom practices with scalable innovations</p>
-<p>Our work focuses on ethical, evidence-based solutions for modern education challenges.</p>
+<p>This report documents a comprehensive analysis of data obtained from VARA platform in the context of flexible learning trajectories:</p>
+<ul>
+<li><strong>Behavioral interactions &amp; Self-reported measures</strong>
+<ul>
+<li>Students’ interaction data</li>
+<li>Surveys responses</li>
+</ul></li>
+<li><strong>Learning outcomes</strong>:
+<ul>
+<li><em>Knowledge gain</em> (objective assessment scores)<br>
+</li>
+<li><em>Perceived effectiveness</em> (subjective learning evaluations)</li>
+</ul></li>
+</ul>
+<hr>
+<section id="key-insights" class="level3">
+<h3 class="anchored" data-anchor-id="key-insights">Key Insights</h3>
+<section id="feature-target-relationships" class="level4">
+<h4 class="anchored" data-anchor-id="feature-target-relationships">🔍 Feature-Target Relationships</h4>
+<ul>
+<li>Self-reports strongly predict <strong>perceived effectiveness</strong> (Accuracy = 0.79) but poorly explain <strong>knowledge gain</strong> (Accuracy = 0.33)<br>
+</li>
+<li>Behavioral patterns alone show limited predictive power for either outcome</li>
+</ul>
+<hr>
+
+
 </section>
-<div class="g-col-12 g-col-md-4 d-flex align-items-center">
-<div class="quarto-figure quarto-figure-center" style="max-width: 250px;">
-<figure class="figure">
-<p><img src="https://cdn-icons-png.flaticon.com/512/2103/2103633.png" class="img-fluid float-end figure-img"></p>
-<figcaption>Connecting the dots</figcaption>
-</figure>
-</div>
-</div>
-</div>
-
-
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -255,8 +260,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   });
   clipboard.on('success', onCopySuccess);
   if (window.document.getElementById('quarto-embedded-source-code-modal')) {
-    // For code content inside modals, clipBoardJS needs to be initialized with a container option
-    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
     const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
       text: getTextToCopy,
       container: window.document.getElementById('quarto-embedded-source-code-modal')
@@ -367,7 +370,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       if (window.Quarto?.typesetMath) {
         window.Quarto.typesetMath(note);
       }
-      // TODO in 1.5, we should make sure this works without a callout special case
       if (note.classList.contains("callout")) {
         return note.outerHTML;
       } else {
@@ -600,7 +602,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       &nbsp;
     </div>   
     <div class="nav-footer-center">
-<p>Pankaj Chejara</p>
+<p>Center of Educational Technology, Tallinn University, Tallinn, Estonia</p>
 </div>
     <div class="nav-footer-right">
       &nbsp;

@@ -2,12 +2,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.57">
+<meta name="generator" content="quarto-1.6.42">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Pankaj Chejara">
-<meta name="dcterms.date" content="2025-04-04">
+<meta name="dcterms.date" content="2025-04-08">
 
 <title>Exploratory Analysis – TULA</title>
 <style>
@@ -56,27 +56,7 @@ div.sourceCode
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-/* CSS for citations */
-div.csl-bib-body { }
-div.csl-entry {
-  clear: both;
-  margin-bottom: 0em;
-}
-.hanging-indent div.csl-entry {
-  margin-left:2em;
-  text-indent:-2em;
-}
-div.csl-left-margin {
-  min-width:2em;
-  float:left;
-}
-div.csl-right-inline {
-  margin-left:2em;
-  padding-left:1em;
-}
-div.csl-indent {
-  margin-left: 2em;
-}</style>
+</style>
 
 
 <script src="../site_libs/quarto-nav/quarto-nav.js"></script>
@@ -91,10 +71,10 @@ div.csl-indent {
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-de84f8d6bb715db06a919283c2d1e787.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-a56b7a81e88bfcde92952917c4e05426.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -161,12 +141,8 @@ div.csl-indent {
 <span class="menu-text">Analysis</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../posts/results.html"> 
-<span class="menu-text">Results</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../about.html"> 
-<span class="menu-text">About</span></a>
+    <a class="nav-link" href="../posts/predict.html"> 
+<span class="menu-text">Prediction</span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -185,9 +161,10 @@ div.csl-indent {
   <ul class="collapse">
   <li><a href="#correlation-analysis" id="toc-correlation-analysis" class="nav-link active" data-scroll-target="#correlation-analysis">Correlation analysis</a>
   <ul class="collapse">
-  <li><a href="#top-correlations" id="toc-top-correlations" class="nav-link" data-scroll-target="#top-correlations">Top Correlations</a></li>
+  <li><a href="#removing-correlated-behavioral-features" id="toc-removing-correlated-behavioral-features" class="nav-link" data-scroll-target="#removing-correlated-behavioral-features">Removing correlated behavioral features</a></li>
+  <li><a href="#compute-correlation-between-behavioral-features-and-knowledge-perception-measures" id="toc-compute-correlation-between-behavioral-features-and-knowledge-perception-measures" class="nav-link" data-scroll-target="#compute-correlation-between-behavioral-features-and-knowledge-perception-measures">Compute correlation between behavioral features and knowledge &amp; perception measures</a></li>
   </ul></li>
-  <li><a href="#clustering" id="toc-clustering" class="nav-link" data-scroll-target="#clustering">Clustering</a></li>
+  <li><a href="#exploring-behavioral-patterns-through-clustering" id="toc-exploring-behavioral-patterns-through-clustering" class="nav-link" data-scroll-target="#exploring-behavioral-patterns-through-clustering">Exploring Behavioral Patterns Through Clustering</a></li>
   </ul>
 </nav>
 </nav>
@@ -224,7 +201,7 @@ div.csl-indent {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">April 4, 2025</p>
+      <p class="date">April 8, 2025</p>
     </div>
   </div>
   
@@ -242,7 +219,7 @@ div.csl-indent {
 <li>Clusters or patterns of student behavior during the trajectory (e.g., low engagement vs.&nbsp;high engagement students).</li>
 <li>Does lower behavioral engagement correspond with lower perceived effectiveness and learning gain? This could indicate that students who do less (e.g., skip optional tasks, avoid hints) may also feel they learn less or actually gain less.</li>
 </ul>
-<div id="730b8f3d-b684-4b52-9689-ec9037e14d22" class="cell" data-execution_count="39">
+<div id="730b8f3d-b684-4b52-9689-ec9037e14d22" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
@@ -264,469 +241,447 @@ div.csl-indent {
 </div>
 <section id="correlation-analysis" class="level1">
 <h1>Correlation analysis</h1>
-<div id="fab8d4e9-271d-483e-a7da-7af3a8bda45f" class="cell" data-execution_count="41">
+<p>We will follow the following steps</p>
+<ol type="1">
+<li>Remove correlated behavioral metrics (e.g., mean of task completed likely to be correlated with total of task completed)</li>
+<li>Compute correlation between behavioral metrics and knowledge &amp; perception measures.</li>
+</ol>
+<section id="removing-correlated-behavioral-features" class="level2">
+<h2 class="anchored" data-anchor-id="removing-correlated-behavioral-features">Removing correlated behavioral features</h2>
+<p><a href="#fig-correlated" class="quarto-xref">Figure&nbsp;1</a> displays correlation among behavioral features. We will <strong>remove one from each pair of behavioral features having correation &gt; .90</strong>.</p>
+<div id="cell-fig-correlated" class="cell" data-execution_count="59">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb2-2"><a href="#cb2-2"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb2-3"><a href="#cb2-3"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
 <span id="cb2-4"><a href="#cb2-4"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb2-5"><a href="#cb2-5"></a><span class="im">from</span> scipy.stats <span class="im">import</span> pearsonr, spearmanr</span>
-<span id="cb2-6"><a href="#cb2-6"></a></span>
-<span id="cb2-7"><a href="#cb2-7"></a></span>
-<span id="cb2-8"><a href="#cb2-8"></a>group1 <span class="op">=</span> df_ep.columns.to_list()</span>
-<span id="cb2-9"><a href="#cb2-9"></a>group2 <span class="op">=</span> df_kno.columns.to_list() <span class="op">+</span> df_sel.columns.to_list()</span>
-<span id="cb2-10"><a href="#cb2-10"></a></span>
-<span id="cb2-11"><a href="#cb2-11"></a><span class="co"># 1. Compute correlation matrix</span></span>
-<span id="cb2-12"><a href="#cb2-12"></a>corr_method <span class="op">=</span> <span class="st">'spearman'</span>  </span>
-<span id="cb2-13"><a href="#cb2-13"></a>corr_matrix <span class="op">=</span> clean_df.corr(method<span class="op">=</span>corr_method)</span>
+<span id="cb2-5"><a href="#cb2-5"></a></span>
+<span id="cb2-6"><a href="#cb2-6"></a><span class="co"># Step 1: Calculate the correlation matrix</span></span>
+<span id="cb2-7"><a href="#cb2-7"></a>correlation_matrix <span class="op">=</span> df_ep.corr().<span class="bu">abs</span>()</span>
+<span id="cb2-8"><a href="#cb2-8"></a></span>
+<span id="cb2-9"><a href="#cb2-9"></a><span class="co"># Step 2: Create a mask for the upper triangle of the correlation matrix</span></span>
+<span id="cb2-10"><a href="#cb2-10"></a>mask <span class="op">=</span> np.triu(np.ones_like(correlation_matrix, dtype<span class="op">=</span><span class="bu">bool</span>))</span>
+<span id="cb2-11"><a href="#cb2-11"></a></span>
+<span id="cb2-12"><a href="#cb2-12"></a><span class="co"># Step 3: Set a correlation threshold (commonly 0.7 or 0.8)</span></span>
+<span id="cb2-13"><a href="#cb2-13"></a>threshold <span class="op">=</span> <span class="fl">0.8</span></span>
 <span id="cb2-14"><a href="#cb2-14"></a></span>
-<span id="cb2-15"><a href="#cb2-15"></a><span class="co"># 2. Filter for cross-group correlations only</span></span>
-<span id="cb2-16"><a href="#cb2-16"></a>cross_corr <span class="op">=</span> corr_matrix.loc[group1, group2]</span>
-<span id="cb2-17"><a href="#cb2-17"></a></span>
-<span id="cb2-18"><a href="#cb2-18"></a><span class="co"># 3. Visualization</span></span>
-<span id="cb2-19"><a href="#cb2-19"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">16</span>, <span class="dv">14</span>))</span>
-<span id="cb2-20"><a href="#cb2-20"></a></span>
-<span id="cb2-21"><a href="#cb2-21"></a><span class="co"># Create custom diverging colormap</span></span>
-<span id="cb2-22"><a href="#cb2-22"></a>cmap <span class="op">=</span> sns.diverging_palette(<span class="dv">220</span>, <span class="dv">20</span>, as_cmap<span class="op">=</span><span class="va">True</span>, center<span class="op">=</span><span class="st">'light'</span>)</span>
-<span id="cb2-23"><a href="#cb2-23"></a></span>
-<span id="cb2-24"><a href="#cb2-24"></a><span class="co"># Heatmap with annotations</span></span>
-<span id="cb2-25"><a href="#cb2-25"></a>ax <span class="op">=</span> sns.heatmap(</span>
-<span id="cb2-26"><a href="#cb2-26"></a>    cross_corr,</span>
-<span id="cb2-27"><a href="#cb2-27"></a>    vmin<span class="op">=-</span><span class="dv">1</span>, vmax<span class="op">=</span><span class="dv">1</span>, center<span class="op">=</span><span class="dv">0</span>,</span>
-<span id="cb2-28"><a href="#cb2-28"></a>    cmap<span class="op">=</span>cmap,</span>
-<span id="cb2-29"><a href="#cb2-29"></a>    square<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb2-30"><a href="#cb2-30"></a>    annot<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb2-31"><a href="#cb2-31"></a>    fmt<span class="op">=</span><span class="st">'.2f'</span>,</span>
-<span id="cb2-32"><a href="#cb2-32"></a>    linewidths<span class="op">=</span><span class="fl">.5</span>,</span>
-<span id="cb2-33"><a href="#cb2-33"></a>    cbar_kws<span class="op">=</span>{<span class="st">'shrink'</span>: <span class="fl">0.8</span>}</span>
-<span id="cb2-34"><a href="#cb2-34"></a>)</span>
-<span id="cb2-35"><a href="#cb2-35"></a></span>
-<span id="cb2-36"><a href="#cb2-36"></a><span class="co"># Improve readability</span></span>
-<span id="cb2-37"><a href="#cb2-37"></a>ax.set_xticklabels(ax.get_xticklabels(), rotation<span class="op">=</span><span class="dv">45</span>, ha<span class="op">=</span><span class="st">'right'</span>)</span>
-<span id="cb2-38"><a href="#cb2-38"></a>ax.set_yticklabels(ax.get_yticklabels(), rotation<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb2-39"><a href="#cb2-39"></a>plt.title(<span class="ss">f'</span><span class="sc">{</span>corr_method<span class="sc">.</span>title()<span class="sc">}</span><span class="ss"> Correlation: Hints/Tasks/Activities vs. Knowledge &amp; Perception Metrics'</span>, pad<span class="op">=</span><span class="dv">20</span>)</span>
-<span id="cb2-40"><a href="#cb2-40"></a>plt.tight_layout()</span>
-<span id="cb2-41"><a href="#cb2-41"></a></span>
-<span id="cb2-42"><a href="#cb2-42"></a><span class="co"># 4. Save and show</span></span>
-<span id="cb2-43"><a href="#cb2-43"></a><span class="co">#plt.savefig('correlation_heatmap.png', dpi=300, bbox_inches='tight')</span></span>
-<span id="cb2-44"><a href="#cb2-44"></a>plt.show()</span>
-<span id="cb2-45"><a href="#cb2-45"></a></span>
-<span id="cb2-46"><a href="#cb2-46"></a><span class="co"># 5. Get top correlations (optional)</span></span>
-<span id="cb2-47"><a href="#cb2-47"></a>corr_stack <span class="op">=</span> cross_corr.stack().reset_index()</span>
-<span id="cb2-48"><a href="#cb2-48"></a>corr_stack.columns <span class="op">=</span> [<span class="st">'Group1'</span>, <span class="st">'Group2'</span>, <span class="st">'Correlation'</span>]</span>
-<span id="cb2-49"><a href="#cb2-49"></a>top_pos <span class="op">=</span> corr_stack.sort_values(<span class="st">'Correlation'</span>, ascending<span class="op">=</span><span class="va">False</span>).head(<span class="dv">5</span>)</span>
-<span id="cb2-50"><a href="#cb2-50"></a>top_neg <span class="op">=</span> corr_stack.sort_values(<span class="st">'Correlation'</span>).head(<span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-15"><a href="#cb2-15"></a><span class="co"># Step 4: Find features with correlation greater than the threshold</span></span>
+<span id="cb2-16"><a href="#cb2-16"></a>to_drop <span class="op">=</span> []</span>
+<span id="cb2-17"><a href="#cb2-17"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(correlation_matrix.columns)):</span>
+<span id="cb2-18"><a href="#cb2-18"></a>    <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(i<span class="op">+</span><span class="dv">1</span>, <span class="bu">len</span>(correlation_matrix.columns)):</span>
+<span id="cb2-19"><a href="#cb2-19"></a>        <span class="cf">if</span> correlation_matrix.iloc[i, j] <span class="op">&gt;</span> threshold:</span>
+<span id="cb2-20"><a href="#cb2-20"></a>            colname <span class="op">=</span> correlation_matrix.columns[j]</span>
+<span id="cb2-21"><a href="#cb2-21"></a>            to_drop.append(colname)</span>
+<span id="cb2-22"><a href="#cb2-22"></a>            </span>
+<span id="cb2-23"><a href="#cb2-23"></a><span class="co"># Remove duplicate features to drop</span></span>
+<span id="cb2-24"><a href="#cb2-24"></a>to_drop <span class="op">=</span> <span class="bu">list</span>(<span class="bu">set</span>(to_drop))</span>
+<span id="cb2-25"><a href="#cb2-25"></a><span class="co">#print(f"Features to drop: {"\n\t".join(to_drop)}")</span></span>
+<span id="cb2-26"><a href="#cb2-26"></a></span>
+<span id="cb2-27"><a href="#cb2-27"></a><span class="co"># Step 5: Create a new DataFrame without the correlated features</span></span>
+<span id="cb2-28"><a href="#cb2-28"></a>df_ep_uncorrelated <span class="op">=</span> df_ep.drop(columns<span class="op">=</span>to_drop)</span>
+<span id="cb2-29"><a href="#cb2-29"></a></span>
+<span id="cb2-30"><a href="#cb2-30"></a><span class="co"># Visualize the correlation matrix before removing features with correlation values</span></span>
+<span id="cb2-31"><a href="#cb2-31"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">14</span>, <span class="dv">12</span>))</span>
+<span id="cb2-32"><a href="#cb2-32"></a>plt.title(<span class="st">"Correlation among behavioral features"</span>, fontsize<span class="op">=</span><span class="dv">16</span>)</span>
+<span id="cb2-33"><a href="#cb2-33"></a><span class="co"># Include the correlation values in the heatmap</span></span>
+<span id="cb2-34"><a href="#cb2-34"></a>sns.heatmap(correlation_matrix, annot<span class="op">=</span><span class="va">True</span>, cmap<span class="op">=</span><span class="st">'coolwarm'</span>, mask<span class="op">=</span>mask, </span>
+<span id="cb2-35"><a href="#cb2-35"></a>            fmt<span class="op">=</span><span class="st">'.2f'</span>, annot_kws<span class="op">=</span>{<span class="st">"size"</span>: <span class="dv">8</span>}, linewidths<span class="op">=</span><span class="fl">0.5</span>)</span>
+<span id="cb2-36"><a href="#cb2-36"></a>plt.tight_layout()</span>
+<span id="cb2-37"><a href="#cb2-37"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="analysis_files/figure-html/cell-3-output-1.png" class="img-fluid figure-img"></p>
+<div id="fig-correlated" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-correlated-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="analysis_files/figure-html/fig-correlated-output-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-correlated-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Behavioral correlated features
+</figcaption>
 </figure>
 </div>
 </div>
 </div>
-<section id="top-correlations" class="level2">
-<h2 class="anchored" data-anchor-id="top-correlations">Top Correlations</h2>
-<p>The following table shows top correlation measures.</p>
+<p>Our final set of features for subsequent analysis is given in the following table.</p>
 <table class="caption-top table">
 <colgroup>
+<col style="width: 3%">
 <col style="width: 41%">
-<col style="width: 40%">
-<col style="width: 18%">
+<col style="width: 54%">
 </colgroup>
 <thead>
 <tr class="header">
-<th>Group1</th>
-<th>Group2</th>
-<th>Correlation</th>
+<th>#</th>
+<th>Feature Name</th>
+<th>Description (Inferred)</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td><strong>Positive Correlations</strong></td>
-<td></td>
-<td></td>
+<td>1</td>
+<td>adjusted_hints_used_mean</td>
+<td>Mean number of hints used (adjusted)</td>
 </tr>
 <tr class="even">
-<td>186 adjusted_activities_q3</td>
-<td>T14_TAM_easy</td>
-<td>0.351460</td>
+<td>2</td>
+<td>adjusted_hints_used_q1</td>
+<td>First quartile of hints used (adjusted)</td>
 </tr>
 <tr class="odd">
-<td>177 adjusted_activities_q3</td>
-<td>post_knowl</td>
-<td>0.350219</td>
+<td>3</td>
+<td>adjusted_tasks_completed_mean</td>
+<td>Mean number of tasks completed (adjusted)</td>
 </tr>
 <tr class="even">
-<td>49 adjusted_hints_used_q3</td>
-<td>T4_Post_needforhelp</td>
-<td>0.335138</td>
+<td>4</td>
+<td>adjusted_tasks_completed_q1</td>
+<td>First quartile of tasks completed (adjusted)</td>
 </tr>
 <tr class="odd">
-<td>16 adjusted_hints_used_total</td>
-<td>T4_Post_needforhelp</td>
-<td>0.324479</td>
+<td>5</td>
+<td>adjusted_activities_mean</td>
+<td>Mean activity metric (adjusted)</td>
 </tr>
 <tr class="even">
-<td>5 adjusted_hints_used_mean</td>
-<td>T4_Post_needforhelp</td>
-<td>0.324479</td>
-</tr>
-<tr class="odd">
-<td><strong>Negative Correlations</strong></td>
-<td></td>
-<td></td>
-</tr>
-<tr class="even">
-<td>26 adjusted_hints_used_std</td>
-<td>T2_Post_effectiveness</td>
-<td>-0.204177</td>
-</tr>
-<tr class="odd">
-<td>48 adjusted_hints_used_q3</td>
-<td>T2_Post_effectiveness</td>
-<td>-0.191897</td>
-</tr>
-<tr class="even">
-<td>4 adjusted_hints_used_mean</td>
-<td>T2_Post_effectiveness</td>
-<td>-0.190635</td>
-</tr>
-<tr class="odd">
-<td>15 adjusted_hints_used_total</td>
-<td>T2_Post_effectiveness</td>
-<td>-0.190635</td>
-</tr>
-<tr class="even">
-<td>44 adjusted_hints_used_q3</td>
-<td>pre_knowl</td>
-<td>-0.167217</td>
+<td>6</td>
+<td>adjusted_activities_std</td>
+<td>Standard deviation of activities (adjusted)</td>
 </tr>
 </tbody>
 </table>
 </section>
-</section>
-<section id="clustering" class="level1">
-<h1>Clustering</h1>
-<p>We will now explore behavioral data to identify patterns/clusters. We will follow the following steps</p>
-<ol type="1">
-<li>Identify optimal number of cluster</li>
-<li>Perform clustering using behavioral data (i.e., interactions)</li>
-<li>Distinguish features contributing the most to clustering</li>
-<li>Interpret clusters based on top-5 most contributing features</li>
-</ol>
-<div id="cell-fig-optimal" class="cell" data-execution_count="48">
+<section id="compute-correlation-between-behavioral-features-and-knowledge-perception-measures" class="level2">
+<h2 class="anchored" data-anchor-id="compute-correlation-between-behavioral-features-and-knowledge-perception-measures">Compute correlation between behavioral features and knowledge &amp; perception measures</h2>
+<p>We will apply the Spearman method to compute correlation between selected behavioral features and knowledge &amp; perception measures. <a href="#fig-spearman" class="quarto-xref">Figure&nbsp;2</a> shows correlation measures along with their statistical significance displayed using <code>*</code>.</p>
+<div id="cell-fig-spearman" class="cell" data-execution_count="46">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb3-2"><a href="#cb3-2"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb3-2"><a href="#cb3-2"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb3-3"><a href="#cb3-3"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb3-4"><a href="#cb3-4"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> StandardScaler, MinMaxScaler</span>
-<span id="cb3-5"><a href="#cb3-5"></a><span class="im">from</span> sklearn.cluster <span class="im">import</span> KMeans</span>
-<span id="cb3-6"><a href="#cb3-6"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> silhouette_score</span>
-<span id="cb3-7"><a href="#cb3-7"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
-<span id="cb3-8"><a href="#cb3-8"></a></span>
-<span id="cb3-9"><a href="#cb3-9"></a><span class="co"># Assuming df is your DataFrame with Group 1 features</span></span>
-<span id="cb3-10"><a href="#cb3-10"></a>group1_features <span class="op">=</span> [</span>
-<span id="cb3-11"><a href="#cb3-11"></a>    <span class="st">'adjusted_hints_used_mean'</span>,<span class="st">'adjusted_hints_used_total'</span>,</span>
-<span id="cb3-12"><a href="#cb3-12"></a>    <span class="st">'adjusted_hints_used_std'</span>, </span>
-<span id="cb3-13"><a href="#cb3-13"></a>     <span class="st">'adjusted_hints_used_median'</span>,</span>
-<span id="cb3-14"><a href="#cb3-14"></a>    <span class="st">'adjusted_hints_used_q1'</span>, <span class="st">'adjusted_hints_used_q3'</span>,</span>
-<span id="cb3-15"><a href="#cb3-15"></a>    <span class="st">'adjusted_tasks_completed_mean'</span>, <span class="st">'adjusted_tasks_completed_total'</span>,</span>
-<span id="cb3-16"><a href="#cb3-16"></a>    <span class="st">'adjusted_tasks_completed_std'</span> </span>
-<span id="cb3-17"><a href="#cb3-17"></a>    , <span class="st">'adjusted_tasks_completed_median'</span>,</span>
-<span id="cb3-18"><a href="#cb3-18"></a>    <span class="st">'adjusted_tasks_completed_q1'</span>, <span class="st">'adjusted_tasks_completed_q3'</span>,</span>
-<span id="cb3-19"><a href="#cb3-19"></a>    <span class="st">'adjusted_activities_mean'</span>, <span class="st">'adjusted_activities_total'</span>,</span>
-<span id="cb3-20"><a href="#cb3-20"></a>    <span class="st">'adjusted_activities_std'</span>,</span>
-<span id="cb3-21"><a href="#cb3-21"></a>     <span class="st">'adjusted_activities_median'</span>,</span>
-<span id="cb3-22"><a href="#cb3-22"></a>    <span class="st">'adjusted_activities_q1'</span>, <span class="st">'adjusted_activities_q3'</span></span>
-<span id="cb3-23"><a href="#cb3-23"></a>]</span>
-<span id="cb3-24"><a href="#cb3-24"></a></span>
-<span id="cb3-25"><a href="#cb3-25"></a><span class="co"># 1. Preprocess data</span></span>
-<span id="cb3-26"><a href="#cb3-26"></a>X <span class="op">=</span> clean_df[group1_features].copy()</span>
-<span id="cb3-27"><a href="#cb3-27"></a></span>
-<span id="cb3-28"><a href="#cb3-28"></a><span class="co"># Handle missing values if any</span></span>
-<span id="cb3-29"><a href="#cb3-29"></a>X <span class="op">=</span> X.dropna()</span>
-<span id="cb3-30"><a href="#cb3-30"></a></span>
-<span id="cb3-31"><a href="#cb3-31"></a><span class="co"># Standard scaling</span></span>
-<span id="cb3-32"><a href="#cb3-32"></a>scaler <span class="op">=</span> MinMaxScaler()</span>
-<span id="cb3-33"><a href="#cb3-33"></a>X_scaled <span class="op">=</span> scaler.fit_transform(X)</span>
+<span id="cb3-4"><a href="#cb3-4"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb3-5"><a href="#cb3-5"></a><span class="im">from</span> scipy <span class="im">import</span> stats</span>
+<span id="cb3-6"><a href="#cb3-6"></a></span>
+<span id="cb3-7"><a href="#cb3-7"></a><span class="kw">def</span> compute_correlation_with_significance(df, group1, group2, alpha<span class="op">=</span><span class="fl">0.05</span>):</span>
+<span id="cb3-8"><a href="#cb3-8"></a>    <span class="co">"""</span></span>
+<span id="cb3-9"><a href="#cb3-9"></a><span class="co">    Compute correlation between features in group1 and group2,</span></span>
+<span id="cb3-10"><a href="#cb3-10"></a><span class="co">    and determine statistical significance.</span></span>
+<span id="cb3-11"><a href="#cb3-11"></a><span class="co">    </span></span>
+<span id="cb3-12"><a href="#cb3-12"></a><span class="co">    Returns:</span></span>
+<span id="cb3-13"><a href="#cb3-13"></a><span class="co">    - corr_matrix: correlation matrix</span></span>
+<span id="cb3-14"><a href="#cb3-14"></a><span class="co">    - p_matrix: matrix of p-values</span></span>
+<span id="cb3-15"><a href="#cb3-15"></a><span class="co">    - significant_matrix: boolean matrix indicating significant correlations</span></span>
+<span id="cb3-16"><a href="#cb3-16"></a><span class="co">    """</span></span>
+<span id="cb3-17"><a href="#cb3-17"></a>    <span class="co"># Initialize matrices</span></span>
+<span id="cb3-18"><a href="#cb3-18"></a>    corr_matrix <span class="op">=</span> pd.DataFrame(index<span class="op">=</span>group1, columns<span class="op">=</span>group2)</span>
+<span id="cb3-19"><a href="#cb3-19"></a>    p_matrix <span class="op">=</span> pd.DataFrame(index<span class="op">=</span>group1, columns<span class="op">=</span>group2)</span>
+<span id="cb3-20"><a href="#cb3-20"></a>    </span>
+<span id="cb3-21"><a href="#cb3-21"></a>    <span class="co"># Calculate correlation and p-value for each pair</span></span>
+<span id="cb3-22"><a href="#cb3-22"></a>    <span class="cf">for</span> feat1 <span class="kw">in</span> group1:</span>
+<span id="cb3-23"><a href="#cb3-23"></a>        <span class="cf">for</span> feat2 <span class="kw">in</span> group2:</span>
+<span id="cb3-24"><a href="#cb3-24"></a>            <span class="co"># Calculate Pearson correlation and p-value</span></span>
+<span id="cb3-25"><a href="#cb3-25"></a>            corr, p_value <span class="op">=</span> stats.pearsonr(df[feat1].dropna(), df[feat2].dropna())</span>
+<span id="cb3-26"><a href="#cb3-26"></a>            corr_matrix.loc[feat1, feat2] <span class="op">=</span> corr</span>
+<span id="cb3-27"><a href="#cb3-27"></a>            p_matrix.loc[feat1, feat2] <span class="op">=</span> p_value</span>
+<span id="cb3-28"><a href="#cb3-28"></a>    </span>
+<span id="cb3-29"><a href="#cb3-29"></a>    <span class="co"># Create a matrix indicating significant correlations</span></span>
+<span id="cb3-30"><a href="#cb3-30"></a>    significant_matrix <span class="op">=</span> p_matrix <span class="op">&lt;</span> alpha</span>
+<span id="cb3-31"><a href="#cb3-31"></a>    </span>
+<span id="cb3-32"><a href="#cb3-32"></a>    <span class="cf">return</span> corr_matrix, p_matrix, significant_matrix</span>
+<span id="cb3-33"><a href="#cb3-33"></a></span>
 <span id="cb3-34"><a href="#cb3-34"></a></span>
-<span id="cb3-35"><a href="#cb3-35"></a><span class="co"># 2. Determine optimal number of clusters using Silhouette method</span></span>
-<span id="cb3-36"><a href="#cb3-36"></a>silhouette_scores <span class="op">=</span> []</span>
-<span id="cb3-37"><a href="#cb3-37"></a>k_range <span class="op">=</span> <span class="bu">range</span>(<span class="dv">2</span>, <span class="dv">8</span>)  <span class="co"># Testing cluster numbers from 2 to 7</span></span>
+<span id="cb3-35"><a href="#cb3-35"></a>group1 <span class="op">=</span> [<span class="st">'adjusted_hints_used_mean'</span>, <span class="st">'adjusted_tasks_completed_mean'</span>, <span class="st">'adjusted_tasks_completed_q1'</span>,</span>
+<span id="cb3-36"><a href="#cb3-36"></a>       <span class="st">'adjusted_activities_mean'</span>, <span class="st">'adjusted_activities_std'</span>]</span>
+<span id="cb3-37"><a href="#cb3-37"></a>group2 <span class="op">=</span> df_kno.columns.to_list() <span class="op">+</span> df_sel.columns.to_list()</span>
 <span id="cb3-38"><a href="#cb3-38"></a></span>
-<span id="cb3-39"><a href="#cb3-39"></a><span class="cf">for</span> k <span class="kw">in</span> k_range:</span>
-<span id="cb3-40"><a href="#cb3-40"></a>    kmeans <span class="op">=</span> KMeans(n_clusters<span class="op">=</span>k, random_state<span class="op">=</span><span class="dv">42</span>, n_init<span class="op">=</span><span class="dv">10</span>)</span>
-<span id="cb3-41"><a href="#cb3-41"></a>    cluster_labels <span class="op">=</span> kmeans.fit_predict(X_scaled)</span>
-<span id="cb3-42"><a href="#cb3-42"></a>    silhouette_avg <span class="op">=</span> silhouette_score(X_scaled, cluster_labels)</span>
-<span id="cb3-43"><a href="#cb3-43"></a>    silhouette_scores.append(silhouette_avg)</span>
+<span id="cb3-39"><a href="#cb3-39"></a></span>
+<span id="cb3-40"><a href="#cb3-40"></a><span class="co"># Compute correlation and significance</span></span>
+<span id="cb3-41"><a href="#cb3-41"></a>corr_matrix, p_matrix, significant_matrix <span class="op">=</span> compute_correlation_with_significance(</span>
+<span id="cb3-42"><a href="#cb3-42"></a>    clean_df, group1, group2</span>
+<span id="cb3-43"><a href="#cb3-43"></a>)</span>
 <span id="cb3-44"><a href="#cb3-44"></a></span>
-<span id="cb3-45"><a href="#cb3-45"></a><span class="co"># Plot silhouette scores</span></span>
-<span id="cb3-46"><a href="#cb3-46"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">4</span>))</span>
-<span id="cb3-47"><a href="#cb3-47"></a>plt.plot(k_range, silhouette_scores, <span class="st">'bo-'</span>)</span>
-<span id="cb3-48"><a href="#cb3-48"></a>plt.xlabel(<span class="st">'Number of clusters'</span>)</span>
-<span id="cb3-49"><a href="#cb3-49"></a>plt.ylabel(<span class="st">'Silhouette Score'</span>)</span>
-<span id="cb3-50"><a href="#cb3-50"></a>plt.title(<span class="st">'Silhouette Method For Optimal k'</span>)</span>
-<span id="cb3-51"><a href="#cb3-51"></a>plt.grid(<span class="va">True</span>)</span>
-<span id="cb3-52"><a href="#cb3-52"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-45"><a href="#cb3-45"></a>corr_matrix <span class="op">=</span> corr_matrix.astype(<span class="bu">float</span>)</span>
+<span id="cb3-46"><a href="#cb3-46"></a></span>
+<span id="cb3-47"><a href="#cb3-47"></a><span class="co"># Create a custom annotation matrix</span></span>
+<span id="cb3-48"><a href="#cb3-48"></a><span class="kw">def</span> create_annot_matrix(corr_matrix, significant_matrix):</span>
+<span id="cb3-49"><a href="#cb3-49"></a>    <span class="co">"""Create annotation matrix with correlation values and stars for significance"""</span></span>
+<span id="cb3-50"><a href="#cb3-50"></a>    annot_matrix <span class="op">=</span> corr_matrix.applymap(<span class="kw">lambda</span> x: <span class="ss">f"</span><span class="sc">{</span>x<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
+<span id="cb3-51"><a href="#cb3-51"></a>    </span>
+<span id="cb3-52"><a href="#cb3-52"></a>    <span class="co"># Add stars for significant correlations</span></span>
+<span id="cb3-53"><a href="#cb3-53"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(corr_matrix.index)):</span>
+<span id="cb3-54"><a href="#cb3-54"></a>        <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(corr_matrix.columns)):</span>
+<span id="cb3-55"><a href="#cb3-55"></a>            <span class="cf">if</span> significant_matrix.iloc[i, j]:</span>
+<span id="cb3-56"><a href="#cb3-56"></a>                annot_matrix.iloc[i, j] <span class="op">=</span> annot_matrix.iloc[i, j] <span class="op">+</span> <span class="st">"*"</span></span>
+<span id="cb3-57"><a href="#cb3-57"></a>    </span>
+<span id="cb3-58"><a href="#cb3-58"></a>    <span class="cf">return</span> annot_matrix</span>
+<span id="cb3-59"><a href="#cb3-59"></a></span>
+<span id="cb3-60"><a href="#cb3-60"></a><span class="co"># Create annotation matrix</span></span>
+<span id="cb3-61"><a href="#cb3-61"></a>annot_matrix <span class="op">=</span> create_annot_matrix(corr_matrix, significant_matrix)</span>
+<span id="cb3-62"><a href="#cb3-62"></a></span>
+<span id="cb3-63"><a href="#cb3-63"></a><span class="co"># Plot the correlation heatmap</span></span>
+<span id="cb3-64"><a href="#cb3-64"></a>plt.figure(figsize<span class="op">=</span>(<span class="bu">max</span>(<span class="dv">8</span>, <span class="bu">len</span>(group2)), <span class="bu">max</span>(<span class="dv">6</span>, <span class="bu">len</span>(group1))))</span>
+<span id="cb3-65"><a href="#cb3-65"></a>sns.heatmap(</span>
+<span id="cb3-66"><a href="#cb3-66"></a>    corr_matrix, </span>
+<span id="cb3-67"><a href="#cb3-67"></a>    annot<span class="op">=</span>annot_matrix, </span>
+<span id="cb3-68"><a href="#cb3-68"></a>    fmt<span class="op">=</span><span class="st">""</span>, </span>
+<span id="cb3-69"><a href="#cb3-69"></a>    cmap<span class="op">=</span><span class="st">"coolwarm"</span>, </span>
+<span id="cb3-70"><a href="#cb3-70"></a>    vmin<span class="op">=-</span><span class="dv">1</span>, </span>
+<span id="cb3-71"><a href="#cb3-71"></a>    vmax<span class="op">=</span><span class="dv">1</span>,</span>
+<span id="cb3-72"><a href="#cb3-72"></a>    linewidths<span class="op">=</span><span class="fl">0.5</span>,</span>
+<span id="cb3-73"><a href="#cb3-73"></a>    cbar_kws<span class="op">=</span>{<span class="st">"label"</span>: <span class="st">"Correlation Coefficient"</span>}</span>
+<span id="cb3-74"><a href="#cb3-74"></a>)</span>
+<span id="cb3-75"><a href="#cb3-75"></a>plt.title(<span class="st">"Correlation Between Feature Groups (Spearman)"</span>, fontsize<span class="op">=</span><span class="dv">14</span>)</span>
+<span id="cb3-76"><a href="#cb3-76"></a>plt.xlabel(<span class="st">"Behavioral Features"</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb3-77"><a href="#cb3-77"></a>plt.ylabel(<span class="st">"Knowledge &amp; Perception Features"</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb3-78"><a href="#cb3-78"></a>plt.tight_layout()</span>
+<span id="cb3-79"><a href="#cb3-79"></a></span>
+<span id="cb3-80"><a href="#cb3-80"></a>plt.show()</span>
+<span id="cb3-81"><a href="#cb3-81"></a></span>
+<span id="cb3-82"><a href="#cb3-82"></a><span class="co"># Optional: Display the actual p-values</span></span>
+<span id="cb3-83"><a href="#cb3-83"></a><span class="co">#print("P-values for correlations:")</span></span>
+<span id="cb3-84"><a href="#cb3-84"></a><span class="co">#print(p_matrix.round(4))</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
-<div id="fig-optimal" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
+<div id="fig-spearman" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-optimal-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="analysis_files/figure-html/fig-optimal-output-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img">
+<div aria-describedby="fig-spearman-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="analysis_files/figure-html/fig-spearman-output-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img">
 </div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-optimal-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;1: Optimal number of clusters
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-spearman-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Spearman correlation between behavioral features and knowledge &amp; perception measures
 </figcaption>
 </figure>
 </div>
 </div>
 </div>
-<div id="98546894-61d6-4677-9850-13f8945ecbb5" class="cell" data-execution_count="68">
+</section>
+</section>
+<section id="exploring-behavioral-patterns-through-clustering" class="level1">
+<h1>Exploring Behavioral Patterns Through Clustering</h1>
+<p>We will analyze behavioral data to identify emergent patterns using unsupervised clustering techniques. Our approach involves:</p>
+<ul>
+<li><p><strong>Determining the optimal number of clusters using the Silhouette method to evaluate cluster cohesion and separation</strong>.</p></li>
+<li><p><strong>Applying k-means clustering on the selected (uncorrelated) behavioral features to group participants based on similar behavioral profiles</strong>.</p></li>
+</ul>
+<p>Finally, we will interpret the clusters by examining the distribution of key behavioral metrics within each group, uncovering meaningful insights into distinct behavioral patterns.</p>
+<div id="cell-fig-sil" class="cell" data-execution_count="67">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1"></a><span class="co"># Select optimal k</span></span>
-<span id="cb4-2"><a href="#cb4-2"></a>optimal_k <span class="op">=</span> k_range[np.argmax(silhouette_scores)]</span>
-<span id="cb4-3"><a href="#cb4-3"></a></span>
-<span id="cb4-4"><a href="#cb4-4"></a></span>
-<span id="cb4-5"><a href="#cb4-5"></a><span class="co"># Perform K-means clustering with optimal k</span></span>
-<span id="cb4-6"><a href="#cb4-6"></a>kmeans <span class="op">=</span> KMeans(n_clusters<span class="op">=</span>optimal_k, random_state<span class="op">=</span><span class="dv">42</span>, n_init<span class="op">=</span><span class="dv">10</span>)</span>
-<span id="cb4-7"><a href="#cb4-7"></a>cluster_labels <span class="op">=</span> kmeans.fit_predict(X_scaled)</span>
-<span id="cb4-8"><a href="#cb4-8"></a>clean_df[<span class="st">'cluster'</span>] <span class="op">=</span> cluster_labels</span>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> StandardScaler, MinMaxScaler</span>
+<span id="cb4-2"><a href="#cb4-2"></a><span class="im">from</span> sklearn.cluster <span class="im">import</span> KMeans</span>
+<span id="cb4-3"><a href="#cb4-3"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> silhouette_score</span>
+<span id="cb4-4"><a href="#cb4-4"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb4-5"><a href="#cb4-5"></a></span>
+<span id="cb4-6"><a href="#cb4-6"></a><span class="co"># Assuming df is your DataFrame with Group 1 features</span></span>
+<span id="cb4-7"><a href="#cb4-7"></a>group1_features <span class="op">=</span> [<span class="st">'adjusted_hints_used_mean'</span>, <span class="st">'adjusted_tasks_completed_mean'</span>, <span class="st">'adjusted_tasks_completed_q1'</span>,</span>
+<span id="cb4-8"><a href="#cb4-8"></a>       <span class="st">'adjusted_activities_mean'</span>, <span class="st">'adjusted_activities_std'</span>]</span>
 <span id="cb4-9"><a href="#cb4-9"></a></span>
-<span id="cb4-10"><a href="#cb4-10"></a><span class="co"># Cluster statistics summary</span></span>
-<span id="cb4-11"><a href="#cb4-11"></a>cluster_stats <span class="op">=</span> clean_df.groupby(<span class="st">'cluster'</span>)[group1_features].mean().T</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
-<p>The optimal number of clusters is <strong>2</strong> based on Silhouette method. We use that as the value of K=2 in our clustering algorithm which will assign each student record to a cluster. We later use these cluster labels to identify most important features using Random Forest approarch (See <span class="citation" data-cites="ismaili2014supervised">Ismaili, Lemaire, and Cornuéjols (<a href="#ref-ismaili2014supervised" role="doc-biblioref">2014</a>)</span> for more info)</p>
-<p><a href="#fig-top-5" class="quarto-xref">Figure&nbsp;2</a> below shows top-10 important features for clustering.</p>
-<div id="cell-fig-top-5" class="cell" data-execution_count="52">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split</span>
-<span id="cb5-2"><a href="#cb5-2"></a><span class="im">from</span> sklearn.ensemble <span class="im">import</span> RandomForestClassifier</span>
-<span id="cb5-3"><a href="#cb5-3"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> StandardScaler</span>
-<span id="cb5-4"><a href="#cb5-4"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split</span>
-<span id="cb5-5"><a href="#cb5-5"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> classification_report</span>
-<span id="cb5-6"><a href="#cb5-6"></a></span>
-<span id="cb5-7"><a href="#cb5-7"></a><span class="co"># Prepare data</span></span>
-<span id="cb5-8"><a href="#cb5-8"></a>X <span class="op">=</span> clean_df[group1_features].copy()</span>
-<span id="cb5-9"><a href="#cb5-9"></a>y <span class="op">=</span> clean_df[<span class="st">'cluster'</span>].copy()</span>
-<span id="cb5-10"><a href="#cb5-10"></a></span>
-<span id="cb5-11"><a href="#cb5-11"></a><span class="co"># Handle missing values if any</span></span>
-<span id="cb5-12"><a href="#cb5-12"></a>X <span class="op">=</span> X.dropna()</span>
-<span id="cb5-13"><a href="#cb5-13"></a>y <span class="op">=</span> y.loc[X.index]</span>
-<span id="cb5-14"><a href="#cb5-14"></a></span>
-<span id="cb5-15"><a href="#cb5-15"></a><span class="co"># Standard scaling</span></span>
-<span id="cb5-16"><a href="#cb5-16"></a>scaler <span class="op">=</span> StandardScaler()</span>
-<span id="cb5-17"><a href="#cb5-17"></a>X_scaled <span class="op">=</span> scaler.fit_transform(X)</span>
-<span id="cb5-18"><a href="#cb5-18"></a></span>
-<span id="cb5-19"><a href="#cb5-19"></a><span class="co"># Train-test split</span></span>
-<span id="cb5-20"><a href="#cb5-20"></a>X_train, X_test, y_train, y_test <span class="op">=</span> train_test_split(</span>
-<span id="cb5-21"><a href="#cb5-21"></a>    X_scaled, y, test_size<span class="op">=</span><span class="fl">0.2</span>, random_state<span class="op">=</span><span class="dv">42</span>, stratify<span class="op">=</span>y</span>
-<span id="cb5-22"><a href="#cb5-22"></a>)</span>
-<span id="cb5-23"><a href="#cb5-23"></a></span>
-<span id="cb5-24"><a href="#cb5-24"></a><span class="co"># Train Random Forest</span></span>
-<span id="cb5-25"><a href="#cb5-25"></a>rf <span class="op">=</span> RandomForestClassifier(</span>
-<span id="cb5-26"><a href="#cb5-26"></a>    n_estimators<span class="op">=</span><span class="dv">100</span>,</span>
-<span id="cb5-27"><a href="#cb5-27"></a>    max_depth<span class="op">=</span><span class="dv">5</span>,</span>
-<span id="cb5-28"><a href="#cb5-28"></a>    random_state<span class="op">=</span><span class="dv">42</span>,</span>
-<span id="cb5-29"><a href="#cb5-29"></a>    class_weight<span class="op">=</span><span class="st">'balanced'</span></span>
-<span id="cb5-30"><a href="#cb5-30"></a>)</span>
-<span id="cb5-31"><a href="#cb5-31"></a>rf.fit(X_train, y_train)</span>
-<span id="cb5-32"><a href="#cb5-32"></a></span>
-<span id="cb5-33"><a href="#cb5-33"></a><span class="co"># Get feature importances</span></span>
-<span id="cb5-34"><a href="#cb5-34"></a>importances <span class="op">=</span> rf.feature_importances_</span>
-<span id="cb5-35"><a href="#cb5-35"></a>indices <span class="op">=</span> np.argsort(importances)[<span class="op">-</span><span class="dv">10</span>:]  <span class="co"># Top 5 features</span></span>
-<span id="cb5-36"><a href="#cb5-36"></a>features <span class="op">=</span> X.columns</span>
-<span id="cb5-37"><a href="#cb5-37"></a></span>
-<span id="cb5-38"><a href="#cb5-38"></a><span class="co"># Plot feature importance</span></span>
-<span id="cb5-39"><a href="#cb5-39"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">6</span>))</span>
-<span id="cb5-40"><a href="#cb5-40"></a>plt.title(<span class="st">'Top 10 Important Features for Cluster Prediction'</span>)</span>
-<span id="cb5-41"><a href="#cb5-41"></a>plt.barh(<span class="bu">range</span>(<span class="dv">10</span>), importances[indices], align<span class="op">=</span><span class="st">'center'</span>, color<span class="op">=</span><span class="st">'skyblue'</span>)</span>
-<span id="cb5-42"><a href="#cb5-42"></a>plt.yticks(<span class="bu">range</span>(<span class="dv">10</span>), [features[i] <span class="cf">for</span> i <span class="kw">in</span> indices])</span>
-<span id="cb5-43"><a href="#cb5-43"></a>plt.xlabel(<span class="st">'Relative Importance'</span>)</span>
-<span id="cb5-44"><a href="#cb5-44"></a>plt.tight_layout()</span>
-<span id="cb5-45"><a href="#cb5-45"></a>plt.show()</span>
-<span id="cb5-46"><a href="#cb5-46"></a></span>
-<span id="cb5-47"><a href="#cb5-47"></a><span class="co"># 7. Create a DataFrame of feature importances</span></span>
-<span id="cb5-48"><a href="#cb5-48"></a>importance_df <span class="op">=</span> pd.DataFrame({</span>
-<span id="cb5-49"><a href="#cb5-49"></a>    <span class="st">'Feature'</span>: features,</span>
-<span id="cb5-50"><a href="#cb5-50"></a>    <span class="st">'Importance'</span>: importances</span>
-<span id="cb5-51"><a href="#cb5-51"></a>}).sort_values(<span class="st">'Importance'</span>, ascending<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb4-10"><a href="#cb4-10"></a><span class="co"># 1. Preprocess data</span></span>
+<span id="cb4-11"><a href="#cb4-11"></a>X <span class="op">=</span> clean_df[group1_features].copy()</span>
+<span id="cb4-12"><a href="#cb4-12"></a></span>
+<span id="cb4-13"><a href="#cb4-13"></a><span class="co"># Handle missing values if any</span></span>
+<span id="cb4-14"><a href="#cb4-14"></a>X <span class="op">=</span> X.dropna()</span>
+<span id="cb4-15"><a href="#cb4-15"></a></span>
+<span id="cb4-16"><a href="#cb4-16"></a><span class="co"># Standard scaling</span></span>
+<span id="cb4-17"><a href="#cb4-17"></a>scaler <span class="op">=</span> MinMaxScaler()</span>
+<span id="cb4-18"><a href="#cb4-18"></a>X_scaled <span class="op">=</span> scaler.fit_transform(X)</span>
+<span id="cb4-19"><a href="#cb4-19"></a></span>
+<span id="cb4-20"><a href="#cb4-20"></a><span class="co"># 2. Determine optimal number of clusters using Silhouette method</span></span>
+<span id="cb4-21"><a href="#cb4-21"></a>silhouette_scores <span class="op">=</span> []</span>
+<span id="cb4-22"><a href="#cb4-22"></a>k_range <span class="op">=</span> <span class="bu">range</span>(<span class="dv">2</span>, <span class="dv">8</span>)  <span class="co"># Testing cluster numbers from 2 to 7</span></span>
+<span id="cb4-23"><a href="#cb4-23"></a></span>
+<span id="cb4-24"><a href="#cb4-24"></a><span class="cf">for</span> k <span class="kw">in</span> k_range:</span>
+<span id="cb4-25"><a href="#cb4-25"></a>    kmeans <span class="op">=</span> KMeans(n_clusters<span class="op">=</span>k, random_state<span class="op">=</span><span class="dv">42</span>, n_init<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb4-26"><a href="#cb4-26"></a>    cluster_labels <span class="op">=</span> kmeans.fit_predict(X_scaled)</span>
+<span id="cb4-27"><a href="#cb4-27"></a>    silhouette_avg <span class="op">=</span> silhouette_score(X_scaled, cluster_labels)</span>
+<span id="cb4-28"><a href="#cb4-28"></a>    silhouette_scores.append(silhouette_avg)</span>
+<span id="cb4-29"><a href="#cb4-29"></a></span>
+<span id="cb4-30"><a href="#cb4-30"></a><span class="co"># Plot silhouette scores</span></span>
+<span id="cb4-31"><a href="#cb4-31"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">4</span>))</span>
+<span id="cb4-32"><a href="#cb4-32"></a>plt.plot(k_range, silhouette_scores, <span class="st">'bo-'</span>)</span>
+<span id="cb4-33"><a href="#cb4-33"></a>plt.xlabel(<span class="st">'Number of clusters'</span>)</span>
+<span id="cb4-34"><a href="#cb4-34"></a>plt.ylabel(<span class="st">'Silhouette Score'</span>)</span>
+<span id="cb4-35"><a href="#cb4-35"></a>plt.title(<span class="st">'Silhouette Method For Optimal k'</span>)</span>
+<span id="cb4-36"><a href="#cb4-36"></a>plt.grid(<span class="va">True</span>)</span>
+<span id="cb4-37"><a href="#cb4-37"></a>plt.show()</span>
+<span id="cb4-38"><a href="#cb4-38"></a></span>
+<span id="cb4-39"><a href="#cb4-39"></a><span class="co"># Select optimal k</span></span>
+<span id="cb4-40"><a href="#cb4-40"></a>optimal_k <span class="op">=</span> k_range[np.argmax(silhouette_scores)]</span>
+<span id="cb4-41"><a href="#cb4-41"></a><span class="co">#print(f"Optimal number of clusters: {optimal_k}")</span></span>
+<span id="cb4-42"><a href="#cb4-42"></a></span>
+<span id="cb4-43"><a href="#cb4-43"></a><span class="co"># 3. Perform K-means clustering with optimal k</span></span>
+<span id="cb4-44"><a href="#cb4-44"></a>kmeans <span class="op">=</span> KMeans(n_clusters<span class="op">=</span>optimal_k, random_state<span class="op">=</span><span class="dv">42</span>, n_init<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb4-45"><a href="#cb4-45"></a>cluster_labels <span class="op">=</span> kmeans.fit_predict(X_scaled)</span>
+<span id="cb4-46"><a href="#cb4-46"></a>clean_df[<span class="st">'cluster'</span>] <span class="op">=</span> cluster_labels</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
-<div id="fig-top-5" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
+<div id="fig-sil" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-top-5-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="analysis_files/figure-html/fig-top-5-output-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img">
+<div aria-describedby="fig-sil-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="analysis_files/figure-html/fig-sil-output-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img">
 </div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-top-5-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;2: Top 10 important features for cluster prediction
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-sil-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: Silhouette score for different k
 </figcaption>
 </figure>
 </div>
 </div>
 </div>
-<p>Now, we will attempt to interpret the two clusters using identified key behavioral features. <a href="#fig-cluster_dist" class="quarto-xref">Figure&nbsp;3</a> shows distribution of those key features across two clusters.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Number of clusters
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The optimal number of clusters is 2 following the Silhouette method.</p>
+</div>
+</div>
+<p><a href="#fig-beh-dist" class="quarto-xref">Figure&nbsp;4</a> shows distribution of behavioral features across two clusters. These distribution can be used for interpretation purposes.</p>
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1"></a><span class="co"># Set style</span></span>
-<span id="cb6-2"><a href="#cb6-2"></a>sns.set_style(<span class="st">"whitegrid"</span>)</span>
-<span id="cb6-3"><a href="#cb6-3"></a>palette <span class="op">=</span> sns.color_palette(<span class="st">"husl"</span>, n_colors<span class="op">=</span><span class="bu">len</span>(clean_df[<span class="st">'cluster'</span>].unique()))  </span>
-<span id="cb6-4"><a href="#cb6-4"></a></span>
-<span id="cb6-5"><a href="#cb6-5"></a></span>
-<span id="cb6-6"><a href="#cb6-6"></a><span class="co"># Features to plot</span></span>
-<span id="cb6-7"><a href="#cb6-7"></a>features <span class="op">=</span> [</span>
-<span id="cb6-8"><a href="#cb6-8"></a>    <span class="st">'adjusted_activities_total'</span>,</span>
-<span id="cb6-9"><a href="#cb6-9"></a>    <span class="st">'adjusted_activities_median'</span>,</span>
-<span id="cb6-10"><a href="#cb6-10"></a>    <span class="st">'adjusted_tasks_completed_total'</span>,</span>
-<span id="cb6-11"><a href="#cb6-11"></a>    <span class="st">'adjusted_hints_used_mean'</span>,</span>
-<span id="cb6-12"><a href="#cb6-12"></a>    <span class="st">'adjusted_hints_used_total'</span>,</span>
-<span id="cb6-13"><a href="#cb6-13"></a>    <span class="st">'adjusted_tasks_completed_mean'</span>,</span>
-<span id="cb6-14"><a href="#cb6-14"></a>    </span>
-<span id="cb6-15"><a href="#cb6-15"></a>]</span>
-<span id="cb6-16"><a href="#cb6-16"></a></span>
-<span id="cb6-17"><a href="#cb6-17"></a><span class="cf">for</span> feature <span class="kw">in</span> features:</span>
-<span id="cb6-18"><a href="#cb6-18"></a>    <span class="co">#| label: f"fig-{feature}"</span></span>
-<span id="cb6-19"><a href="#cb6-19"></a>    <span class="co">#| fig-subcap: f"{feature}"</span></span>
-<span id="cb6-20"><a href="#cb6-20"></a>    plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">6</span>))</span>
-<span id="cb6-21"><a href="#cb6-21"></a>    </span>
-<span id="cb6-22"><a href="#cb6-22"></a>    <span class="co"># Box plot</span></span>
-<span id="cb6-23"><a href="#cb6-23"></a>    ax <span class="op">=</span> sns.boxplot(</span>
-<span id="cb6-24"><a href="#cb6-24"></a>        x<span class="op">=</span><span class="st">'cluster'</span>,</span>
-<span id="cb6-25"><a href="#cb6-25"></a>        y<span class="op">=</span>feature,</span>
-<span id="cb6-26"><a href="#cb6-26"></a>        data<span class="op">=</span>clean_df,</span>
-<span id="cb6-27"><a href="#cb6-27"></a>        palette<span class="op">=</span>palette,</span>
-<span id="cb6-28"><a href="#cb6-28"></a>        width<span class="op">=</span><span class="fl">0.5</span>,</span>
-<span id="cb6-29"><a href="#cb6-29"></a>        showfliers<span class="op">=</span><span class="va">False</span>  <span class="co"># Hide outliers for cleaner visualization</span></span>
-<span id="cb6-30"><a href="#cb6-30"></a>    )</span>
-<span id="cb6-31"><a href="#cb6-31"></a>    </span>
-<span id="cb6-32"><a href="#cb6-32"></a>    <span class="co"># Add data points</span></span>
-<span id="cb6-33"><a href="#cb6-33"></a>    sns.stripplot(</span>
-<span id="cb6-34"><a href="#cb6-34"></a>        x<span class="op">=</span><span class="st">'cluster'</span>,</span>
-<span id="cb6-35"><a href="#cb6-35"></a>        y<span class="op">=</span>feature,</span>
-<span id="cb6-36"><a href="#cb6-36"></a>        data<span class="op">=</span>clean_df,</span>
-<span id="cb6-37"><a href="#cb6-37"></a>        color<span class="op">=</span><span class="st">'black'</span>,</span>
-<span id="cb6-38"><a href="#cb6-38"></a>        alpha<span class="op">=</span><span class="fl">0.3</span>,</span>
-<span id="cb6-39"><a href="#cb6-39"></a>        size<span class="op">=</span><span class="dv">4</span>,</span>
-<span id="cb6-40"><a href="#cb6-40"></a>        jitter<span class="op">=</span><span class="fl">0.2</span></span>
-<span id="cb6-41"><a href="#cb6-41"></a>    )</span>
-<span id="cb6-42"><a href="#cb6-42"></a>    </span>
-<span id="cb6-43"><a href="#cb6-43"></a>    <span class="co"># Add annotations</span></span>
-<span id="cb6-44"><a href="#cb6-44"></a>    plt.title(<span class="ss">f'Distribution of </span><span class="sc">{</span>feature<span class="sc">}</span><span class="ss"> by Cluster'</span>, fontsize<span class="op">=</span><span class="dv">14</span>, pad<span class="op">=</span><span class="dv">15</span>)</span>
-<span id="cb6-45"><a href="#cb6-45"></a>    plt.xlabel(<span class="st">'Cluster'</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
-<span id="cb6-46"><a href="#cb6-46"></a>    plt.ylabel(feature, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
-<span id="cb6-47"><a href="#cb6-47"></a>    </span>
-<span id="cb6-48"><a href="#cb6-48"></a></span>
-<span id="cb6-49"><a href="#cb6-49"></a>    <span class="co"># Add legend only once</span></span>
-<span id="cb6-50"><a href="#cb6-50"></a>    <span class="cf">if</span> feature <span class="op">==</span> features[<span class="dv">0</span>]:</span>
-<span id="cb6-51"><a href="#cb6-51"></a>        plt.legend()</span>
-<span id="cb6-52"><a href="#cb6-52"></a>    </span>
-<span id="cb6-53"><a href="#cb6-53"></a>    plt.tight_layout()</span>
-<span id="cb6-54"><a href="#cb6-54"></a>    plt.show()</span>
-<span id="cb6-55"><a href="#cb6-55"></a>    </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1"></a><span class="co"># Set style</span></span>
+<span id="cb5-2"><a href="#cb5-2"></a>sns.set_style(<span class="st">"whitegrid"</span>)</span>
+<span id="cb5-3"><a href="#cb5-3"></a>palette <span class="op">=</span> sns.color_palette(<span class="st">"viridis"</span>, n_colors<span class="op">=</span><span class="bu">len</span>(clean_df[<span class="st">'cluster'</span>].unique()))  </span>
+<span id="cb5-4"><a href="#cb5-4"></a></span>
+<span id="cb5-5"><a href="#cb5-5"></a><span class="co"># Features to plot</span></span>
+<span id="cb5-6"><a href="#cb5-6"></a>features <span class="op">=</span> [<span class="st">'adjusted_hints_used_mean'</span>, <span class="st">'adjusted_tasks_completed_mean'</span>, <span class="st">'adjusted_tasks_completed_q1'</span>,</span>
+<span id="cb5-7"><a href="#cb5-7"></a>       <span class="st">'adjusted_activities_mean'</span>, <span class="st">'adjusted_activities_std'</span>]</span>
+<span id="cb5-8"><a href="#cb5-8"></a></span>
+<span id="cb5-9"><a href="#cb5-9"></a><span class="cf">for</span> feature <span class="kw">in</span> features:</span>
+<span id="cb5-10"><a href="#cb5-10"></a>    plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">6</span>))</span>
+<span id="cb5-11"><a href="#cb5-11"></a></span>
+<span id="cb5-12"><a href="#cb5-12"></a>    <span class="co"># Box plot</span></span>
+<span id="cb5-13"><a href="#cb5-13"></a>    ax <span class="op">=</span> sns.boxplot(</span>
+<span id="cb5-14"><a href="#cb5-14"></a>        x<span class="op">=</span><span class="st">'cluster'</span>,</span>
+<span id="cb5-15"><a href="#cb5-15"></a>        y<span class="op">=</span>feature,</span>
+<span id="cb5-16"><a href="#cb5-16"></a>        data<span class="op">=</span>clean_df,</span>
+<span id="cb5-17"><a href="#cb5-17"></a>        palette<span class="op">=</span>palette,</span>
+<span id="cb5-18"><a href="#cb5-18"></a>        width<span class="op">=</span><span class="fl">0.5</span>,</span>
+<span id="cb5-19"><a href="#cb5-19"></a>        showfliers<span class="op">=</span><span class="va">False</span>  <span class="co"># Hide outliers for cleaner visualization</span></span>
+<span id="cb5-20"><a href="#cb5-20"></a>    )</span>
+<span id="cb5-21"><a href="#cb5-21"></a>    </span>
+<span id="cb5-22"><a href="#cb5-22"></a>    <span class="co"># Add data points</span></span>
+<span id="cb5-23"><a href="#cb5-23"></a>    sns.stripplot(</span>
+<span id="cb5-24"><a href="#cb5-24"></a>        x<span class="op">=</span><span class="st">'cluster'</span>,</span>
+<span id="cb5-25"><a href="#cb5-25"></a>        y<span class="op">=</span>feature,</span>
+<span id="cb5-26"><a href="#cb5-26"></a>        data<span class="op">=</span>clean_df,</span>
+<span id="cb5-27"><a href="#cb5-27"></a>        color<span class="op">=</span><span class="st">'black'</span>,</span>
+<span id="cb5-28"><a href="#cb5-28"></a>        alpha<span class="op">=</span><span class="fl">0.3</span>,</span>
+<span id="cb5-29"><a href="#cb5-29"></a>        size<span class="op">=</span><span class="dv">4</span>,</span>
+<span id="cb5-30"><a href="#cb5-30"></a>        jitter<span class="op">=</span><span class="fl">0.2</span></span>
+<span id="cb5-31"><a href="#cb5-31"></a>    )</span>
+<span id="cb5-32"><a href="#cb5-32"></a>    </span>
+<span id="cb5-33"><a href="#cb5-33"></a>    <span class="co"># Add annotations</span></span>
+<span id="cb5-34"><a href="#cb5-34"></a>    plt.title(<span class="ss">f'Distribution of </span><span class="sc">{</span>feature<span class="sc">}</span><span class="ss"> by Cluster'</span>, fontsize<span class="op">=</span><span class="dv">14</span>, pad<span class="op">=</span><span class="dv">15</span>)</span>
+<span id="cb5-35"><a href="#cb5-35"></a>    plt.xlabel(<span class="st">'Cluster'</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb5-36"><a href="#cb5-36"></a>    plt.ylabel(feature, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb5-37"><a href="#cb5-37"></a>    </span>
+<span id="cb5-38"><a href="#cb5-38"></a></span>
+<span id="cb5-39"><a href="#cb5-39"></a>    <span class="co"># Add legend only once</span></span>
+<span id="cb5-40"><a href="#cb5-40"></a>    <span class="cf">if</span> feature <span class="op">==</span> features[<span class="dv">0</span>]:</span>
+<span id="cb5-41"><a href="#cb5-41"></a>        plt.legend()</span>
+<span id="cb5-42"><a href="#cb5-42"></a>    </span>
+<span id="cb5-43"><a href="#cb5-43"></a>    plt.tight_layout()</span>
+<span id="cb5-44"><a href="#cb5-44"></a>    plt.show()</span>
+<span id="cb5-45"><a href="#cb5-45"></a>    </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div id="fig-cluster_dist" class="quarto-layout-panel">
+<div id="fig-beh-dist" class="quarto-layout-panel">
 <figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-cluster_dist-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div aria-describedby="fig-beh-dist-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="quarto-layout-row">
-<div class="cell-output cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-cluster_dist" style="flex-basis: 50.0%;justify-content: flex-start;">
-<div id="fig-cluster_dist-1" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div class="cell-output cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-beh-dist" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div id="fig-beh-dist-1" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-subfloat-fig figure">
-<div aria-describedby="fig-cluster_dist-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="analysis_files/figure-html/fig-cluster_dist-output-1.png" class="img-fluid figure-img" data-ref-parent="fig-cluster_dist">
+<div aria-describedby="fig-beh-dist-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="analysis_files/figure-html/fig-beh-dist-output-1.png" class="img-fluid figure-img" data-ref-parent="fig-beh-dist">
 </div>
-<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-cluster_dist-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-(a) Adjusted activities (total)
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-beh-dist-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(a) Adjusted Mean Hints Used
 </figcaption>
 </figure>
 </div>
 </div>
-<div class="cell-output cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-cluster_dist" style="flex-basis: 50.0%;justify-content: flex-start;">
-<div id="fig-cluster_dist-2" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div class="cell-output cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-beh-dist" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div id="fig-beh-dist-2" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-subfloat-fig figure">
-<div aria-describedby="fig-cluster_dist-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="analysis_files/figure-html/fig-cluster_dist-output-2.png" class="img-fluid figure-img" data-ref-parent="fig-cluster_dist">
+<div aria-describedby="fig-beh-dist-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="analysis_files/figure-html/fig-beh-dist-output-2.png" class="img-fluid figure-img" data-ref-parent="fig-beh-dist">
 </div>
-<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-cluster_dist-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-(b) Adjusted activities (median)
-</figcaption>
-</figure>
-</div>
-</div>
-</div>
-<div class="quarto-layout-row">
-<div class="cell-output cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-cluster_dist" style="flex-basis: 50.0%;justify-content: flex-start;">
-<div id="fig-cluster_dist-3" class="quarto-float quarto-figure quarto-figure-center anchored">
-<figure class="quarto-float quarto-subfloat-fig figure">
-<div aria-describedby="fig-cluster_dist-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="analysis_files/figure-html/fig-cluster_dist-output-3.png" class="img-fluid figure-img" data-ref-parent="fig-cluster_dist">
-</div>
-<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-cluster_dist-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-(c) Adjusted task completed (total)
-</figcaption>
-</figure>
-</div>
-</div>
-<div class="cell-output cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-cluster_dist" style="flex-basis: 50.0%;justify-content: flex-start;">
-<div id="fig-cluster_dist-4" class="quarto-float quarto-figure quarto-figure-center anchored">
-<figure class="quarto-float quarto-subfloat-fig figure">
-<div aria-describedby="fig-cluster_dist-4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="analysis_files/figure-html/fig-cluster_dist-output-4.png" class="img-fluid figure-img" data-ref-parent="fig-cluster_dist">
-</div>
-<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-cluster_dist-4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-(d) Adjusted hints used (mean)
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-beh-dist-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(b) Adjusted Mean Tasks Completed
 </figcaption>
 </figure>
 </div>
 </div>
 </div>
 <div class="quarto-layout-row">
-<div class="cell-output cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-cluster_dist" style="flex-basis: 50.0%;justify-content: flex-start;">
-<div id="fig-cluster_dist-5" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div class="cell-output cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-beh-dist" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div id="fig-beh-dist-3" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-subfloat-fig figure">
-<div aria-describedby="fig-cluster_dist-5-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="analysis_files/figure-html/fig-cluster_dist-output-5.png" class="img-fluid figure-img" data-ref-parent="fig-cluster_dist">
+<div aria-describedby="fig-beh-dist-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="analysis_files/figure-html/fig-beh-dist-output-3.png" class="img-fluid figure-img" data-ref-parent="fig-beh-dist">
 </div>
-<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-cluster_dist-5-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-(e) Adjusted hints used (total)
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-beh-dist-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(c) Adjusted Q1 Tasks Completed
 </figcaption>
 </figure>
 </div>
 </div>
-<div class="cell-output cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-cluster_dist" style="flex-basis: 50.0%;justify-content: flex-start;">
-<div id="fig-cluster_dist-6" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div class="cell-output cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-beh-dist" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div id="fig-beh-dist-4" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-subfloat-fig figure">
-<div aria-describedby="fig-cluster_dist-6-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="analysis_files/figure-html/fig-cluster_dist-output-6.png" class="img-fluid figure-img" data-ref-parent="fig-cluster_dist">
+<div aria-describedby="fig-beh-dist-4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="analysis_files/figure-html/fig-beh-dist-output-4.png" class="img-fluid figure-img" data-ref-parent="fig-beh-dist">
 </div>
-<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-cluster_dist-6-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-(f) Adjusted task completed (mean)
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-beh-dist-4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(d) Adjusted Mean Activities
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="quarto-layout-row">
+<div class="cell-output cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-beh-dist" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div id="fig-beh-dist-5" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig figure">
+<div aria-describedby="fig-beh-dist-5-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="analysis_files/figure-html/fig-beh-dist-output-5.png" class="img-fluid figure-img" data-ref-parent="fig-beh-dist">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-beh-dist-5-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(e) Adjusted Std. Dev. of Activities
 </figcaption>
 </figure>
 </div>
 </div>
 </div>
 </div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-cluster_dist-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;3: Behavioral clusters and metrics distribution
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-beh-dist-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4: Distribution of Behavioral Metrics Across Clusters
 </figcaption>
 </figure>
 </div>
-
+<p><strong>Cluster Interpretation: Engagement Levels</strong></p>
+<ul>
+<li><p><strong>Low Engagement Group:</strong> Shows limited help-seeking (↓ hints), lower task completion (↓ tasks), and inconsistent activity patterns (↑ std. dev.), suggesting sporadic participation.</p></li>
+<li><p><strong>High Engagement Group:</strong> Demonstrates strategic help use (↑ hints), higher task throughput (↑ tasks), and stable activity (↓ std. dev.), indicating consistent, goal-directed behavior.</p></li>
+</ul>
+<div id="03c7384b-47fa-4529-8ea1-dc88e70d6cf4" class="cell" data-execution_count="95">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1"></a>X[<span class="st">'student_id'</span>] <span class="op">=</span> X.index</span>
+<span id="cb6-2"><a href="#cb6-2"></a>X.to_csv(<span class="st">'uncorreled_features.csv'</span>,index<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
 
 
 </section>
 
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
-<div id="ref-ismaili2014supervised" class="csl-entry" role="listitem">
-Ismaili, Oumaima Alaoui, Vincent Lemaire, and Antoine Cornuéjols. 2014. <span>“A Supervised Methodology to Measure the Variables Contribution to a Clustering.”</span> In <em>Neural Information Processing: 21st International Conference, ICONIP 2014, Kuching, Malaysia, November 3-6, 2014. Proceedings, Part i 21</em>, 159–66. Springer.
-</div>
-</div></section></div></main> <!-- /main -->
+</main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
@@ -809,8 +764,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   });
   clipboard.on('success', onCopySuccess);
   if (window.document.getElementById('quarto-embedded-source-code-modal')) {
-    // For code content inside modals, clipBoardJS needs to be initialized with a container option
-    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
     const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
       text: getTextToCopy,
       container: window.document.getElementById('quarto-embedded-source-code-modal')
@@ -921,7 +874,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       if (window.Quarto?.typesetMath) {
         window.Quarto.typesetMath(note);
       }
-      // TODO in 1.5, we should make sure this works without a callout special case
       if (note.classList.contains("callout")) {
         return note.outerHTML;
       } else {
@@ -1154,7 +1106,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       &nbsp;
     </div>   
     <div class="nav-footer-center">
-<p>Pankaj Chejara</p>
+<p>Center of Educational Technology, Tallinn University, Tallinn, Estonia</p>
 </div>
     <div class="nav-footer-right">
       &nbsp;
